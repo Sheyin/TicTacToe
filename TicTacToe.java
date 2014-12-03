@@ -245,7 +245,12 @@ class TicTacToe {
 	}
 	
 	int[] RandomMove (int[] grid) {
-		isLegal = LegalMove(grid, move);
+		int doThis = 0;
+		boolean isLegal = false;
+		do {
+			doThis = (Math.rand()*10);
+			isLegal = LegalMove(grid, doThis); 
+				} while (!isLegal);
 		grid = AddPoint(grid, move, false);
 		return grid;
 	}
