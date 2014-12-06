@@ -1,6 +1,7 @@
 import java.util.Scanner;
+import static java.util.Arrays.fill;
 
-class TicTacToe {
+public class ttt {
 
 	public static void main (String[] args) {
 		char[] grid = {' ',' ',' ', ' ',' ', ' ',' ', ' ',' '};
@@ -32,14 +33,6 @@ class TicTacToe {
 			return false;
 			}
 		}
-		
-	public static void PrintGrid(char[] grid) {
-		//char[9] fgrid = ConvGrid(grid);
-		System.out.println("/n " + grid[0] + " | " + grid[1] + " | " + grid[2]);
-		System.out.println("/n " + grid[3] + " | " + grid[4] + " | " + grid[5]);
-		System.out.println("/n " + grid[6] + " | " + grid[7] + " | " + grid[8]);
-		return;
-		}
 	
 	public static char[] AddPoint(char[] grid, int spot, boolean playerTurn) {
 		if (playerTurn)
@@ -60,7 +53,8 @@ class TicTacToe {
 		int move = 0;
 		boolean isLegal = false;
 		do {
-			move = PlayerInput();
+			System.out.println("Select a tile.");
+			move = PlayerInput(grid);
 			isLegal = LegalMove(grid, move);
 			
 			if (isLegal) {
@@ -75,7 +69,7 @@ class TicTacToe {
 	}
 
 		
-	public static int PlayerInput(){
+	public static int PlayerInput(char[] grid){
 		Scanner user_input = new Scanner(System.in);
 		String playerInput = user_input.nextLine();
 		char toTest = playerInput.charAt(0);
@@ -87,6 +81,7 @@ class TicTacToe {
 				return spot;
 				}
 			else { 	// invalid input
+				PrintGrid(grid);
 				System.out.println("Invalid input.  Please pick a square by choosing a number.");
 				playerInput = user_input.nextLine();
 				}
@@ -137,13 +132,16 @@ class TicTacToe {
 	}
 
 	public static int VictoryCheck (char [] grid) {
+		System.out.println("Debug: VictoryCheck Calling on MoveCheck()");
 		int[] summary = MoveCheck(grid);
 		for(int i=0; i<16; i++){
 			if (summary[i] == 3) {
+				System.out.println("Debug: VictoryCheck found 3 in a row");
 				return i;
 				}
 			}
 			// no one won yet
+				System.out.println("Debug: VictoryCheck found nothing (-1)");
 				return -1;
 	}
 	
@@ -161,11 +159,13 @@ class TicTacToe {
 		
 	public static int[] MoveCheck (char[] grid) {		// summarize each of the rows
 		int[] testspots = {0,1,2,3,4,5,6,7,8,0,3,6,1,4,7,2,5,8,0,4,8,2,4,6};
-		int[] sortedresults = {0};
+		int[] sortedresults = new int[24];
+		fill(sortedresults,0);
 		int XCount = 0;
 		int OCount = 0;
 		int nullCount = 0;
-		int[] unsorted = {0};
+		int[] unsorted = new int[24];
+		fill(unsorted,0);
 		int rowcount = 0;
 		for (int i = 0; i < 25; i++){
 			if (grid[i] == 'X'){
@@ -174,13 +174,18 @@ class TicTacToe {
 				OCount++; }
 			if (grid[i] == ' '){
 				nullCount++; }
-			rowcount++;
+				rowcount++;
 			
-			if ((i+1)%3 == 0){
+			if (((i+1)%3 == 0) && (i!=0)){
+				System.out.println("Debug: MoveCheck i is: " + i);
 				unsorted[i-2] = XCount;
+				System.out.println("Debug: Added XCount to space in grid: " + (i-2));
 				unsorted[i-1] = OCount;
+				System.out.println("Debug: Added OCount to space in grid: " + (i-1));
 				unsorted[i] = nullCount;
+				System.out.println("Debug: Added null to space in grid: " + i);
 				i = i+3;
+				System.out.println("Debug: Calling on SortResults()");
 				sortedresults = SortResults (unsorted);
 				
 				//reset counters
@@ -193,14 +198,17 @@ class TicTacToe {
 		}
 		
 	public static int[] SortResults(int[] unsorted) {
-		int[] sorted = {0};
+		int[] sorted = new int[24];
 		int i = 0;
+		int j = 0;
 		do {
-			sorted[i] = unsorted[i];
-			sorted[i+8] = unsorted[i+1];
-			sorted[i+16] = unsorted[i+2];
+			sorted[j] = unsorted[i];
+			System.out.println("Debug: SortResults: added sorted " + i);
+			sorted[j+8] = unsorted[i+1];
+			sorted[j+16] = unsorted[i+2];
 			i = i+3;
-			} while (i<24);
+			j++;
+			} while (i<24);	//this may be problematic
 		return sorted;
 	}
 	
@@ -300,5 +308,24 @@ class TicTacToe {
 		grid = AddPoint(grid, move, false);
 		return grid;
 	}
+	
+		public static void PrintGrid(char[] grid) {
+		System.out.println(grid[0] + " | " + grid[1] + " | " + grid[2]);
+		System.out.println("_________");
+		System.out.println(grid[3] + " | " + grid[4] + " | " + grid[5]);
+		System.out.println("_________");
+		System.out.println(grid[6] + " | " + grid[7] + " | " + grid[8]);
+		return;
+		}
+		
+		/* experimental new code here
+		public static void PrintGrid(char[] grid) {
+		System.out.println(1 + " | " + 2 + " | " + 3);
+		System.out.println("_________");
+		System.out.println(4 + " | " + 5 + " | " + 6);
+		System.out.println("_________");
+		System.out.println(7 + " | " + 8 + " | " + 9);
+		return;
+		} */
 	
 }
