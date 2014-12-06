@@ -5,10 +5,11 @@ public class ttt {
 
 	public static void main (String[] args) {
 		char[] grid = {' ',' ',' ', ' ',' ', ' ',' ', ' ',' '};
-		int moveCount = 0;
+		int moveCount = 1;
 		int victory = -1;
 		boolean playerturn = CoinFlip();
 		do {
+			System.out.println("Debug: main(): movecount=" + moveCount);
 			PrintGrid(grid);
 			if (playerturn) {
 				grid = PlayerMove(grid);
@@ -16,7 +17,7 @@ public class ttt {
 					}
 			else {	// playerturn == false
 				grid = CompMove(grid);
-				playerturn = false;
+				playerturn = true;
 				}
 			victory = VictoryCheck(grid);
 			moveCount++;
@@ -78,7 +79,7 @@ public class ttt {
 			if (validInput) {
 				int spot = Character.getNumericValue(toTest);
 				//int spot = parseInt(user_input[0]-1);
-				return spot;
+				return (spot-1);
 				}
 			else { 	// invalid input
 				PrintGrid(grid);
@@ -106,15 +107,20 @@ public class ttt {
 		boolean isLegal = false;
 		summary = MoveCheck(grid);
 		int spot = FindSpot(summary);
+		System.out.println("Debug: CompMove processing spot (" + spot + ") from FindSpot");
 		if (spot == -1) {
-			do {
-				spot = (int)(Math.random() * 10);
+			do {	// random move
+				spot = (int)((Math.random() * 10) -1);
+				System.out.println("Debug: CompMove() spot(random) = " + spot);
 				isLegal = LegalMove(grid,spot);
+				System.out.println("Debug: CompMove() isLegal=" + isLegal);
 				} while(!isLegal);
 			}
 		else {	// need to turn spot (a row) into a location
+			System.out.println("Debug: CompMove() sending spot (" + spot + ") to IDRow");
 			int [] rownumbers = IDRow(spot);	// this returns the array locations in grid of that row
 			spot = FindBlank(grid, rownumbers);
+			System.out.println("Debug: CompMove: spot=" + spot);
 			}
 		grid = AddPoint(grid,spot,false);
 		return grid;
@@ -122,17 +128,21 @@ public class ttt {
 		
 	public static int FindBlank(char[] grid, int[] row) {
 		char toTest;
+		System.out.println("Debug: FindBlank");
+		System.out.println("Debug: The row is: " + row[0] + row[1] + row[2]);
 		
 		for (int i=0;i<3;i++){
 			toTest = grid[row[i]];
+			System.out.println("Debug: FindBlank() toTest=" + toTest);
 			if (toTest == ' '){
-				return i; }
+				System.out.println("Debug: FindBlank() returning row[i]:" + row[i]);
+				return row[i]; }
 		}
 		return -1;	// is this needed?
 	}
 
 	public static int VictoryCheck (char [] grid) {
-		System.out.println("Debug: VictoryCheck Calling on MoveCheck()");
+		System.out.println("Debug: Starting VictoryCheck, Calling on MoveCheck()");
 		int[] summary = MoveCheck(grid);
 		for(int i=0; i<16; i++){
 			if (summary[i] == 3) {
@@ -146,47 +156,49 @@ public class ttt {
 	}
 	
 	public static void DeclareVictory(int winner) {
+	System.out.println("Debug: DeclareVictory() winner=" + winner);
 		if (winner > 7) {		//player wins
 			System.out.println("You win!");
 			}
-		if ((winner >= 0) && (winner < 8)) {	// computer wins
-			System.out.println("You lose!");
-			}
-		else {	//draw (?)
-			System.out.println("It's a draw!");
+		else {
+			if ((winner >= 0) && (winner < 8)) {	// computer wins
+				System.out.println("You lose!");
+				}
+			else {	//draw (?)
+				System.out.println("It's a draw!");
+				}
 			}
 	}
 		
-	public static int[] MoveCheck (char[] grid) {		// summarize each of the rows
-		int[] testspots = {0,1,2,3,4,5,6,7,8,0,3,6,1,4,7,2,5,8,0,4,8,2,4,6};
+	public static int[] MoveCheck (char[] grid) {		// summarize each of the rows (counts)
+		//System.out.println("Debug: Starting MoveCheck()");
+		int[] row = {0,1,2,3,4,5,6,7,8,0,3,6,1,4,7,2,5,8,0,4,8,2,4,6};		// these locations define the 8 rows (victory conditions)
 		int[] sortedresults = new int[24];
 		fill(sortedresults,0);
 		int XCount = 0;
 		int OCount = 0;
 		int nullCount = 0;
-		int[] unsorted = new int[24];
-		fill(unsorted,0);
+		//int[] unsorted = new int[24];
+		//fill(unsorted,0);
 		int rowcount = 0;
-		for (int i = 0; i < 25; i++){
-			if (grid[i] == 'X'){
+		//this 
+		for (int i = 0; i < 24; i++){
+			//System.out.println("Debug: MoveCheck starting().  Loop #" + i + ", row[i]=" + row[i]);
+			if (grid[row[i]] == 'X'){
 				XCount++; }
-			if (grid[i] == 'O'){
+			if (grid[row[i]] == 'O'){
 				OCount++; }
-			if (grid[i] == ' '){
+			if (grid[row[i]] == ' '){
 				nullCount++; }
-				rowcount++;
 			
 			if (((i+1)%3 == 0) && (i!=0)){
-				System.out.println("Debug: MoveCheck i is: " + i);
-				unsorted[i-2] = XCount;
-				System.out.println("Debug: Added XCount to space in grid: " + (i-2));
-				unsorted[i-1] = OCount;
-				System.out.println("Debug: Added OCount to space in grid: " + (i-1));
-				unsorted[i] = nullCount;
-				System.out.println("Debug: Added null to space in grid: " + i);
-				i = i+3;
-				System.out.println("Debug: Calling on SortResults()");
-				sortedresults = SortResults (unsorted);
+				//System.out.println("Debug: MoveCheck writing to sortedresults. i=" + i);
+				sortedresults[rowcount] = XCount;		// 0-7
+				sortedresults[rowcount+8] = OCount;		// 8-15
+				sortedresults[rowcount+16] = nullCount;	// 16-23
+				rowcount++;
+				//System.out.println("Debug: Calling on SortResults()");
+				//sortedresults = SortResults (unsorted);
 				
 				//reset counters
 				XCount = 0;
@@ -194,23 +206,25 @@ public class ttt {
 				nullCount = 0;
 				}
 			}
+		//System.out.println("Debug: MoveCheck() returning sortedresults");
 		return sortedresults;
 		}
 		
+	/* Might not need this method after all.
 	public static int[] SortResults(int[] unsorted) {
 		int[] sorted = new int[24];
 		int i = 0;
 		int j = 0;
 		do {
 			sorted[j] = unsorted[i];
-			System.out.println("Debug: SortResults: added sorted " + i);
 			sorted[j+8] = unsorted[i+1];
 			sorted[j+16] = unsorted[i+2];
 			i = i+3;
 			j++;
 			} while (i<24);	//this may be problematic
+			System.out.println("Debug: SortResults() returning sorted");
 		return sorted;
-	}
+	} */
 	
 	public int[] TestSpots(){		//this just returns the pattern of rows used on the grid to match up spots.
 		//rownum 1: int[] row1 = [0, 1, 2];
@@ -226,6 +240,8 @@ public class ttt {
 	}
 	
 	public static int FindSpot(int[] summary) {	//this is searching for particular parameters.  i<8 means XX_, i<16 means OO_.
+		System.out.println("Debug: Calling on FindSpot()");
+		System.out.println("Debug: FindSpot() summary");
 		for (int i=0; i<8; i++) {	// this is just checking for two X's and a blank
 			if ((summary[i] == 2) && (summary[i+8] == 1)) {
 				return i; }		//this is the row where there is a legal move - need to find the blank spot
@@ -248,54 +264,51 @@ public class ttt {
 		//rownum 6: int[] col3 = [2, 5, 8];
 		//rownum 7: int[] diag1 = [0, 4, 8];
 		//rownum 8: int[] diag2 = [2, 4, 6];
-		
+		System.out.println("Debug: IDRow() rownumber=" + rownumber);
+		if (rownumber > 7) {
+			rownumber = rownumber - 8;
+			System.out.println("Debug: IDRow: new rownumber=" + rownumber);
+			}
+			
 		switch (rownumber) {
-			case 1: {
+			case 0: {
 				int[] thisrow = {0, 1, 2};
 				return thisrow;	
 				}
-			case 2: {
+			case 1: {
 				int[] thisrow = {3, 4, 5};
 				return thisrow;	
 				}
-			case 3: {
+			case 2: {
 				int[] thisrow = {6, 7, 8};
 				return thisrow;	
 				}
-			case 4: {
+			case 3: {
 				int[] thisrow = {0, 3, 6};
 				return thisrow;	
 				}
-			case 5: {
+			case 4: {
 				int[] thisrow = {1, 4, 7};
 				return thisrow;	
 				}
-			case 6: {
+			case 5: {
 				int[] thisrow = {2, 5, 8};
 				return thisrow;	
 				}
-			case 7: {
+			case 6: {
 				int[] thisrow = {0, 4, 8};
 				return thisrow;	
 				}
-			case 8: {
+			case 7: {
 				int[] thisrow = {2, 4, 6};
 				return thisrow;	
 				}
 			default: {
 				int[] thisrow = {0, 0, 0};
+				System.out.println("Debug: IDRow() fell into default.  Error!");
 				return thisrow;	
 				}
 		}
-	}
-
-	public int FindBlankSpot(int[] spots, char[] grid) {
-		for(int i = 0; i < 3; i++) {
-			if (grid[spots[i]] == ' ') {
-				return spots[i]; }
-			//else redo for loop
-		}
-		return -1;
 	}
 	
 	public char[] RandomMove (char[] grid) {
