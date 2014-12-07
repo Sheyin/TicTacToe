@@ -144,7 +144,6 @@ public class ttt {
 			rowTest[j+1] = row[i+1];
 			rowTest[j+2] = row[i+2];
 			moveHere = RowTest(grid, rowTest, 'O');
-			System.out.println("moveHere = " + moveHere);
 				if (moveHere >= 0) {
 					return moveHere; }
 			i = i + 3;
