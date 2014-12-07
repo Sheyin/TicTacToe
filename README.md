@@ -3,4 +3,8 @@ TicTacToe
 
 Another bit of practice.
 
-This code won't yet compile + hasn't been completed yet.  (backup for interdevice viewing)
+Currently functional though still needs some improvements.
+
+To work on:
+-Validating input + error handling
+-Improvements for formatting
