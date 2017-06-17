@@ -1,13 +1,13 @@
 import java.util.Scanner;
 import static java.util.Arrays.fill;
 
-public class ttt {
+public class TicTacToe {
 
 	public static void main (String[] args) {
 		char[] grid = {' ',' ',' ', ' ',' ', ' ',' ', ' ',' '};
 		int moveCount = 1;
 		boolean victory = false;
-		boolean playerturn = CoinFlip();
+		boolean playerturn = coinFlip();
 		do {
 			PrintGrid(grid);
 			if (playerturn) {
@@ -24,12 +24,17 @@ public class ttt {
 		DeclareVictory('T');
 		}
 		
-	public static boolean CoinFlip() {
-		int randnum = (int)(Math.random());
-		if (randnum < 0.45) {
+
+	// coinFlip(): Determines who goes first by rolling a random number and determining if odd/even
+	public static boolean coinFlip() {
+		int randnum = (int)(Math.random() * 100);
+		System.out.println("Random: " + randnum);
+		// if odd
+		if (randnum % 2) {
 			return true;
 			}
-		else {	// >0.45
+		// if even
+		else {
 			return false;
 			}
 		}
