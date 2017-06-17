@@ -9,19 +9,19 @@ public class TicTacToe {
 		boolean victory = false;
 		boolean playerturn = coinFlip();
 		do {
-			PrintGrid(grid);
+			printGrid(grid);
 			if (playerturn) {
-				PlayerMove(grid);
+				playerMove(grid);
 				playerturn = false;
 					}
 			else {	// playerturn == false
 				System.out.println("Computer turn!");
-				CompMove(grid);
+				compMove(grid);
 				playerturn = true;
 				}
 			moveCount++;
 			} while((moveCount < 10) && (!victory));
-		DeclareVictory('T');
+		declareVictory('T');
 		}
 		
 
@@ -30,7 +30,7 @@ public class TicTacToe {
 		int randnum = (int)(Math.random() * 100);
 		System.out.println("Random: " + randnum);
 		// if odd
-		if (randnum % 2) {
+		if (randnum % 2 == 1) {
 			return true;
 			}
 		// if even
@@ -39,33 +39,36 @@ public class TicTacToe {
 			}
 		}
 	
-	public static void AddPoint(char[] grid, int spot, boolean playerTurn) {
+	// addPoint(): Adds an O or X to the grid (if player or computer)
+	public static void addPoint(char[] grid, int spot, boolean playerTurn) {
 		if (playerTurn)
 			grid[spot] = 'O';
 		else	// comp turn
 			grid[spot] = 'X';
 			
-		VictoryCheck(grid);
+		victoryCheck(grid);
 		return;
 		}
 		
-	public static boolean LegalMove(char[] grid, int spot) {
+	// legalMove(): Checks if the desired input is legal or not (within grid range, or occupied)
+	public static boolean legalMove(char[] grid, int spot) {
 		if ((grid[spot] == ' ') && (spot >= 0) && (spot < 10))
 			return true;
 		else
 			return false;
 		}
 		
-	public static void PlayerMove(char[] grid) {
+	// playerMove(): Overall function handling player movement
+	public static void playerMove(char[] grid) {
 		int move = 0;
 		boolean isLegal = false;
 		do {
 			System.out.print("Select a spot: ");
-			move = PlayerInput(grid);
-			isLegal = LegalMove(grid, move);
+			move = playerInput(grid);
+			isLegal = legalMove(grid, move);
 			
 			if (isLegal) {
-				AddPoint(grid, move, true);
+				addPoint(grid, move, true);
 				return;
 			}
 			else {
@@ -76,11 +79,11 @@ public class TicTacToe {
 	}
 
 		
-	public static int PlayerInput(char[] grid){
+	public static int playerInput(char[] grid){
 		Scanner user_input = new Scanner(System.in);
 		String playerInput = user_input.nextLine();
 		char toTest = playerInput.charAt(0);
-		boolean validInput = InputCheck(toTest);
+		boolean validInput = inputCheck(toTest);
 		do {
 			if (validInput) {
 				int spot = Character.getNumericValue(toTest);
@@ -88,7 +91,7 @@ public class TicTacToe {
 				return (spot-1);
 				}
 			else { 	// invalid input
-				PrintGrid(grid);
+				printGrid(grid);
 				System.out.println("Invalid input.  Please pick a square by choosing a number.");
 				playerInput = user_input.nextLine();
 				}
@@ -96,7 +99,7 @@ public class TicTacToe {
 			return -1; //is this needed?
 		}
 		
-	public static boolean InputCheck (int toCheck) {	// don't forget to subtract 1 when checking
+	public static boolean inputCheck (int toCheck) {	// don't forget to subtract 1 when checking
 	/* fix me
 		try {	// this blocks test if it is an integer at all
 			//Integer.parseInt(String); 
@@ -109,21 +112,21 @@ public class TicTacToe {
 		}
 		
 	// testing out void return
-	public static void CompMove (char[] grid) {		// decides optimal move - victory, defend, some move in same row, then random move
+	public static void compMove (char[] grid) {		// decides optimal move - victory, defend, some move in same row, then random move
 		boolean isLegal = false;
-		int spot = TwoCheck(grid);
+		int spot = twoCheck(grid);
 
 		if (spot == -1) {
 			do {	// random move
 				spot = (int)((Math.random() * 10) -1);
-				isLegal = LegalMove(grid,spot);
+				isLegal = legalMove(grid,spot);
 				} while(!isLegal);
 			}
-		AddPoint(grid,spot,false);
+		addPoint(grid,spot,false);
 		return;
 		}
 	
-	public static int TwoCheck (char[] grid) {
+	public static int twoCheck (char[] grid) {
 		int[] row = {0,1,2,3,4,5,6,7,8,0,3,6,1,4,7,2,5,8,0,4,8,2,4,6};		// these locations define the 8 rows (victory conditions)
 		int[] rowTest = new int[3];
 		int i = 0;
@@ -133,7 +136,7 @@ public class TicTacToe {
 			rowTest[j] = row[i];
 			rowTest[j+1] = row[i+1];
 			rowTest[j+2] = row[i+2];
-			moveHere = RowTest(grid, rowTest, 'X');
+			moveHere = rowTest(grid, rowTest, 'X');
 			//System.out.println("Debug: moveHere = " + moveHere);
 				if (moveHere >= 0) {
 					return moveHere; }
@@ -148,7 +151,7 @@ public class TicTacToe {
 			rowTest[j] = row[i];
 			rowTest[j+1] = row[i+1];
 			rowTest[j+2] = row[i+2];
-			moveHere = RowTest(grid, rowTest, 'O');
+			moveHere = rowTest(grid, rowTest, 'O');
 				if (moveHere >= 0) {
 					return moveHere; }
 			i = i + 3;
@@ -157,7 +160,7 @@ public class TicTacToe {
 		return -1;
 	}
 	
-	public static int RowTest(char[] grid, int[] row, char testFor) {		// Tests the given row for victory/defend conditions.
+	public static int rowTest(char[] grid, int[] row, char testFor) {		// Tests the given row for victory/defend conditions.
 		int testcount = 0;
 		int blankspot = 0;
 		int blanklocation = -1;
@@ -178,50 +181,58 @@ public class TicTacToe {
 			return -1;	// no pairs found, or filled
 			}
 	}
-	
-	public static boolean VictoryCheck (char [] grid) {
+
+
+	// victoryCheck(): This is called after every move to see if there is a winner or not.
+	// It works by counting the number of X's, O's, and blank spaces
+	public static boolean victoryCheck (char [] grid) {
 		int[] row = {0,1,2,3,4,5,6,7,8,0,3,6,1,4,7,2,5,8,0,4,8,2,4,6};		// these locations define the 8 rows (victory conditions)
-		int XCount = 0;
-		int OCount = 0;
+		int xCount = 0;
+		int oCount = 0;
 		int tiecount = 0;
 		int nullCount = 0;
+		
+		// Since there are only 8 possible combinations, with 3 characters each, go through each of the 24 characters defined in row
 		for (int rowcount = 0; rowcount < 24; rowcount++) {
 				if (grid[row[rowcount]] == ' ') {
 					nullCount++;
 					}
 				if (grid[row[rowcount]] == 'X') {
-					XCount++;
+					xCount++;
 					tiecount++;
 					}
 				if (grid[row[rowcount]] == 'O') {
-					OCount++;
+					oCount++;
 					tiecount++;
 					}
 	
+		// If a victory was detected, print grid and play ending sequence (see if it is the last character in a row defined in row)
 		if ((rowcount + 1) % 3 == 0) {
-			if (XCount == 3) {
-				PrintGrid(grid);
-				DeclareVictory('X');
+			if (xCount == 3) {
+				printGrid(grid);
+				declareVictory('X');
 				}
-			if (OCount == 3) {
-				PrintGrid(grid);
-				DeclareVictory('O');
+			if (oCount == 3) {
+				printGrid(grid);
+				declareVictory('O');
 				}
 			if (tiecount == 24) {
-				PrintGrid(grid);
-				DeclareVictory('T');
+				printGrid(grid);
+				declareVictory('T');
 				}
 				
 			// resetting counters
-			XCount = 0;
-			OCount = 0;
+			xCount = 0;
+			oCount = 0;
 			nullCount = 0;
 			}
 		}	
 		return false;
 	}
-	
-	public static void DeclareVictory(char winner) {
+
+
+	// declareVictory(): prints winning text and ends game
+	public static void declareVictory(char winner) {
 		switch (winner) {
 			case 'O': {
 				System.out.println("You win!");
@@ -238,7 +249,7 @@ public class TicTacToe {
 			}
 		}
 		
-	public static void PrintGrid(char[] grid) {
+	public static void printGrid(char[] grid) {
 		System.out.println(grid[0] + " | " + grid[1] + " | " + grid[2]);
 		System.out.println("_________");
 		System.out.println(grid[3] + " | " + grid[4] + " | " + grid[5]);
